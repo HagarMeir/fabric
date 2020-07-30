@@ -360,7 +360,7 @@ var _ = Describe("EndToEnd Smart BFT configuration test", func() {
 			assertBlockReception(map[string]int{"testchannel1": 7}, network.Orderers, peer, network)
 		})
 
-		PIt("smartbft node addition and removal", func() {
+		It("smartbft node addition and removal", func() {
 			network = nwo.New(nwo.MultiNodeSmartBFT(), testDir, client, StartPort(), components)
 			network.GenerateConfigTree()
 			network.Bootstrap()
@@ -532,10 +532,10 @@ var _ = Describe("EndToEnd Smart BFT configuration test", func() {
 			Eventually(proc.Ready(), network.EventuallyTimeout).Should(BeClosed())
 
 			By("Making sure previous leader abdicates")
-			Eventually(runner.Err(), network.EventuallyTimeout, time.Second).Should(gbytes.Say("Changing to follower role, current view: 1, current leader: 2 channel=systemchannel"))
+			Eventually(ordererRunners[2].Err(), network.EventuallyTimeout, time.Second).Should(gbytes.Say("Changing to follower role, current view: 1, current leader: 2 channel=systemchannel"))
 
 			By("Making sure previous leader sees the new leader")
-			Eventually(runner.Err(), network.EventuallyTimeout, time.Second).Should(gbytes.Say("Message from 2 channel=systemchannel"))
+			Eventually(ordererRunners[2].Err(), network.EventuallyTimeout, time.Second).Should(gbytes.Say("Message from 2 channel=systemchannel"))
 
 			By("Ensure all nodes are in sync")
 			assertBlockReception(map[string]int{
@@ -543,25 +543,26 @@ var _ = Describe("EndToEnd Smart BFT configuration test", func() {
 				"testchannel1":  4,
 			}, network.Orderers, peer, network)
 
-			orderer = network.Orderers[1]
-
 			By("Transacting on testchannel1, again")
-			invokeQuery(network, peer, orderer, channel, 70)
-			invokeQuery(network, peer, orderer, channel, 60)
-			invokeQuery(network, peer, orderer, channel, 50)
+			invokeQuery(network, peer, network.Orderers[4], channel, 70)
 
 			By("Ensuring added node participates in consensus")
-			Eventually(runner.Err(), network.EventuallyTimeout, time.Second).Should(gbytes.Say("Deciding on seq 7"))
+			Eventually(ordererRunners[2].Err(), network.EventuallyTimeout, time.Second).Should(gbytes.Say("Deciding on seq 5"))
+
+			By("Transacting on testchannel1 again, after ensuring all participated")
+			invokeQuery(network, peer, network.Orderers[0], channel, 60)
+			invokeQuery(network, peer, network.Orderers[1], channel, 50)
 
 			By("Ensure all nodes are in sync, again")
 			assertBlockReception(map[string]int{"testchannel1": 7}, network.Orderers, peer, network)
 
 			By("Removing the added node from the channels")
-			for _, channel := range []string{"systemchannel", "testchannel1"} {
-				nwo.UpdateSmartBFTMetadata(network, peer, orderer, channel, func(md *smartbft.ConfigMetadata) {
-					md.Consenters = md.Consenters[:4]
-				})
-			}
+			nwo.UpdateSmartBFTMetadata(network, peer, network.Orderers[2], "testchannel1", func(md *smartbft.ConfigMetadata) {
+				md.Consenters = md.Consenters[:4]
+			})
+			nwo.UpdateSmartBFTMetadata(network, peer, network.Orderers[1], "systemchannel", func(md *smartbft.ConfigMetadata) {
+				md.Consenters = md.Consenters[:4]
+			})
 
 			assertBlockReception(map[string]int{
 				"systemchannel": 3,
@@ -588,7 +589,7 @@ var _ = Describe("EndToEnd Smart BFT configuration test", func() {
 			waitForBlockReceptionByPeer(peer, network, "testchannel1", 8)
 
 			By("Transact again")
-			invokeQuery(network, peer, orderer, channel, 40)
+			invokeQuery(network, peer, network.Orderers[2], channel, 40)
 
 			By("Ensuring the existing nodes got the block")
 			assertBlockReception(map[string]int{
@@ -596,7 +597,7 @@ var _ = Describe("EndToEnd Smart BFT configuration test", func() {
 			}, network.Orderers[:4], peer, network)
 
 			By("Adding back the node to the application channel")
-			nwo.UpdateSmartBFTMetadata(network, peer, orderer, channel, func(md *smartbft.ConfigMetadata) {
+			nwo.UpdateSmartBFTMetadata(network, peer, network.Orderers[2], channel, func(md *smartbft.ConfigMetadata) {
 				md.Consenters = append(md.Consenters, &smartbft.Consenter{
 					MspId:       "OrdererMSP",
 					ConsenterId: 5,
@@ -617,10 +618,10 @@ var _ = Describe("EndToEnd Smart BFT configuration test", func() {
 			}, network.Orderers, peer, network)
 
 			By("Transact again")
-			invokeQuery(network, peer, orderer, channel, 30)
+			invokeQuery(network, peer, network.Orderers[3], channel, 30)
 
 			By("Ensuring re-added node participates in consensus")
-			Eventually(runner.Err(), network.EventuallyTimeout, time.Second).Should(gbytes.Say("Deciding on seq 11"))
+			Eventually(network.OrdererRunner(orderer5).Err(), network.EventuallyTimeout, time.Second).Should(gbytes.Say("Deciding on seq 11"))
 		})
 
 		It("smartbft iterated addition and iterated removal", func() {
