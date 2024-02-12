@@ -82,8 +82,6 @@ type BFTChain struct {
 	verifier         *Verifier
 	assembler        *Assembler
 	Metrics          *Metrics
-	MetricsBFT       *api.Metrics
-	MetricsWalBFT    *wal.Metrics
 	bccsp            bccsp.BCCSP
 
 	statusReportMutex sync.Mutex
@@ -135,9 +133,7 @@ func NewChain(
 			IsLeader:             metrics.IsLeader.With("channel", support.ChannelID()),
 			LeaderID:             metrics.LeaderID.With("channel", support.ChannelID()),
 		},
-		MetricsBFT:    metricsBFT.With("channel", support.ChannelID()),
-		MetricsWalBFT: metricsWalBFT.With("channel", support.ChannelID()),
-		bccsp:         bccsp,
+		bccsp: bccsp,
 	}
 
 	lastBlock := LastBlockFromLedgerOrPanic(support, c.Logger)
@@ -191,7 +187,6 @@ func bftSmartConsensusBuild(
 
 	c.Logger.Infof("Initializing a WAL for chain %s, on dir: %s", c.support.ChannelID(), c.WALDir)
 	opt := wal.DefaultOptions()
-	opt.Metrics = c.MetricsWalBFT
 	consensusWAL, walInitState, err = wal.InitializeAndReadAll(c.Logger, c.WALDir, opt)
 	if err != nil {
 		c.Logger.Panicf("failed to initialize a WAL for chain %s, err %s", c.support.ChannelID(), err)
@@ -244,7 +239,6 @@ func bftSmartConsensusBuild(
 				return c.RuntimeConfig.Load().(RuntimeConfig).LastConfigBlock.Header.Number
 			},
 		},
-		Metrics: c.MetricsBFT,
 		Metadata: &smartbftprotos.ViewMetadata{
 			ViewId:                    latestMetadata.ViewId,
 			LatestSequence:            latestMetadata.LatestSequence,
