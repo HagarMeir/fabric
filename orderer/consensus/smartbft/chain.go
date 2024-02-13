@@ -286,7 +286,7 @@ func (c *BFTChain) pruneCommittedRequests(block *cb.Block) {
 			workerNum: workerNum,
 			f: func(tx []byte) {
 				ri := c.verifier.ReqInspector.RequestID(tx)
-				c.consensus.Pool.RemoveRequests(ri)
+				c.consensus.Pool.RemoveRequests(ri.ID)
 			},
 		})
 	}
