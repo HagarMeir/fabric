@@ -40,6 +40,8 @@ github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 h1:UQHMgLO+TxOEl
 github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1/go.mod h1:xomTg63KZ2rFqZQzSB4Vz2SUXa1BpHTVz9L5PTmPC4E=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
+github.com/HagarMeir/consensus v0.0.0-20240212085544-4d9254c3a742 h1:tzmZGE+2qYpOkox5p4lGqpbcCrl312xoG0vc4GCu7Go=
+github.com/HagarMeir/consensus v0.0.0-20240212085544-4d9254c3a742/go.mod h1:KsqqnNjG+MiuEdm/9ufh5C0oKJqd1rkpQ5S2mYPvVcA=
 github.com/IBM/idemix v0.0.2-0.20231011101252-a4feda90f3f7 h1:ybW6FaLCYGEF03XaR+WJP7bq7XqeBI4Pfj8uKipQT+A=
 github.com/IBM/idemix v0.0.2-0.20231011101252-a4feda90f3f7/go.mod h1:74yugcANjVAC9e8wHDmTDvlKHxnPj0V1L9VJ84ExaoU=
 github.com/IBM/idemix/bccsp/schemes/aries v0.0.0-20231003085036-c4470b87b2d6 h1:vz8YaZRqrdZMeTi6EuIQmtWqhmb6eUxKIJQsWQYAIG8=
@@ -59,8 +61,6 @@ github.com/Microsoft/hcsshim v0.11.4/go.mod h1:smjE4dvqPX9Zldna+t5FG3rnoHhaB7QYx
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
-github.com/SmartBFT-Go/consensus v0.0.0-20230907130931-31f018a899a6 h1:yfGSoZgsSZG1sygPBLz/KNk2rKGKOnd4+1LFMt7KXf0=
-github.com/SmartBFT-Go/consensus v0.0.0-20230907130931-31f018a899a6/go.mod h1:KsqqnNjG+MiuEdm/9ufh5C0oKJqd1rkpQ5S2mYPvVcA=
 github.com/VictoriaMetrics/fastcache v1.9.0 h1:oMwsS6c8abz98B7ytAewQ7M1ZN/Im/iwKoE1euaFvhs=
 github.com/VictoriaMetrics/fastcache v1.9.0/go.mod h1:otoTS3xu+6IzF/qByjqzjp3rTuzM3Qf0ScU1UTj97iU=
 github.com/VividCortex/gohistogram v1.0.0 h1:6+hBz+qvs0JOrrNhhmR7lFxo5sINxBCGXrdtl/UvroE=

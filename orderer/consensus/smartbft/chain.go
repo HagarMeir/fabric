@@ -15,7 +15,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/SmartBFT-Go/consensus/pkg/api"
 	smartbft "github.com/SmartBFT-Go/consensus/pkg/consensus"
 	"github.com/SmartBFT-Go/consensus/pkg/types"
 	"github.com/SmartBFT-Go/consensus/pkg/wal"
@@ -82,8 +81,6 @@ type BFTChain struct {
 	verifier         *Verifier
 	assembler        *Assembler
 	Metrics          *Metrics
-	MetricsBFT       *api.Metrics
-	MetricsWalBFT    *wal.Metrics
 	bccsp            bccsp.BCCSP
 
 	statusReportMutex sync.Mutex
@@ -103,8 +100,6 @@ func NewChain(
 	policyManager policies.Manager,
 	support consensus.ConsenterSupport,
 	metrics *Metrics,
-	metricsBFT *api.Metrics,
-	metricsWalBFT *wal.Metrics,
 	bccsp bccsp.BCCSP,
 ) (*BFTChain, error) {
 	logger := flogging.MustGetLogger("orderer.consensus.smartbft.chain").With(zap.String("channel", support.ChannelID()))
@@ -135,9 +130,7 @@ func NewChain(
 			IsLeader:             metrics.IsLeader.With("channel", support.ChannelID()),
 			LeaderID:             metrics.LeaderID.With("channel", support.ChannelID()),
 		},
-		MetricsBFT:    metricsBFT.With("channel", support.ChannelID()),
-		MetricsWalBFT: metricsWalBFT.With("channel", support.ChannelID()),
-		bccsp:         bccsp,
+		bccsp: bccsp,
 	}
 
 	lastBlock := LastBlockFromLedgerOrPanic(support, c.Logger)
@@ -191,7 +184,6 @@ func bftSmartConsensusBuild(
 
 	c.Logger.Infof("Initializing a WAL for chain %s, on dir: %s", c.support.ChannelID(), c.WALDir)
 	opt := wal.DefaultOptions()
-	opt.Metrics = c.MetricsWalBFT
 	consensusWAL, walInitState, err = wal.InitializeAndReadAll(c.Logger, c.WALDir, opt)
 	if err != nil {
 		c.Logger.Panicf("failed to initialize a WAL for chain %s, err %s", c.support.ChannelID(), err)
@@ -244,7 +236,6 @@ func bftSmartConsensusBuild(
 				return c.RuntimeConfig.Load().(RuntimeConfig).LastConfigBlock.Header.Number
 			},
 		},
-		Metrics: c.MetricsBFT,
 		Metadata: &smartbftprotos.ViewMetadata{
 			ViewId:                    latestMetadata.ViewId,
 			LatestSequence:            latestMetadata.LatestSequence,
@@ -295,7 +286,7 @@ func (c *BFTChain) pruneCommittedRequests(block *cb.Block) {
 			workerNum: workerNum,
 			f: func(tx []byte) {
 				ri := c.verifier.ReqInspector.RequestID(tx)
-				c.consensus.Pool.RemoveRequest(ri)
+				c.consensus.Pool.RemoveRequests(ri.ID)
 			},
 		})
 	}

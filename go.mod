@@ -2,11 +2,12 @@ module github.com/hyperledger/fabric
 
 go 1.20
 
+replace github.com/SmartBFT-Go/consensus => github.com/HagarMeir/consensus v0.0.0-20240212085544-4d9254c3a742
+
 require (
 	code.cloudfoundry.org/clock v1.0.0
 	github.com/IBM/idemix v0.0.2-0.20231011101252-a4feda90f3f7
 	github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible
-	github.com/SmartBFT-Go/consensus v0.0.0-20230907130931-31f018a899a6
 	github.com/VictoriaMetrics/fastcache v1.9.0
 	github.com/bits-and-blooms/bitset v1.13.0
 	github.com/cheggaaa/pb v1.0.29
@@ -46,7 +47,10 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require google.golang.org/protobuf v1.31.0
+require (
+	github.com/SmartBFT-Go/consensus v0.0.0-00010101000000-000000000000
+	google.golang.org/protobuf v1.31.0
+)
 
 require (
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24 // indirect
