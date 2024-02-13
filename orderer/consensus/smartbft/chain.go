@@ -15,7 +15,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/SmartBFT-Go/consensus/pkg/api"
 	smartbft "github.com/SmartBFT-Go/consensus/pkg/consensus"
 	"github.com/SmartBFT-Go/consensus/pkg/types"
 	"github.com/SmartBFT-Go/consensus/pkg/wal"
@@ -101,8 +100,6 @@ func NewChain(
 	policyManager policies.Manager,
 	support consensus.ConsenterSupport,
 	metrics *Metrics,
-	metricsBFT *api.Metrics,
-	metricsWalBFT *wal.Metrics,
 	bccsp bccsp.BCCSP,
 ) (*BFTChain, error) {
 	logger := flogging.MustGetLogger("orderer.consensus.smartbft.chain").With(zap.String("channel", support.ChannelID()))
@@ -289,7 +286,7 @@ func (c *BFTChain) pruneCommittedRequests(block *cb.Block) {
 			workerNum: workerNum,
 			f: func(tx []byte) {
 				ri := c.verifier.ReqInspector.RequestID(tx)
-				c.consensus.Pool.RemoveRequest(ri)
+				c.consensus.Pool.RemoveRequests(ri)
 			},
 		})
 	}
